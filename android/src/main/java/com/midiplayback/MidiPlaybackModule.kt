@@ -1,25 +1,47 @@
 package com.midiplayback
 
+import android.media.MediaPlayer
+import android.net.Uri
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
-import com.facebook.react.bridge.Promise
 
-class MidiPlaybackModule(reactContext: ReactApplicationContext) :
-  ReactContextBaseJavaModule(reactContext) {
+class MidiPlaybackModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+
+  private var mediaPlayer: MediaPlayer = MediaPlayer();
 
   override fun getName(): String {
-    return NAME
+      return "MidiPlayback"
   }
 
-  // Example method
-  // See https://reactnative.dev/docs/native-modules-android
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  fun setPlaybackFile(url: String) {
+    val uri = Uri.parse(url);
+    val context = reactApplicationContext;
+    if (context != null) {
+      mediaPlayer = MediaPlayer.create(reactApplicationContext.currentActivity, uri);
+      mediaPlayer.setVolume(50F, 50F);
+    };
+  }
+
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  fun play() {
+    mediaPlayer.start();
+  }
+
   @ReactMethod
-  fun multiply(a: Double, b: Double, promise: Promise) {
-    promise.resolve(a * b)
+  fun stop() {
+    mediaPlayer.stop();
   }
 
-  companion object {
-    const val NAME = "MidiPlayback"
+  @ReactMethod
+  fun pause() {
+    mediaPlayer.pause();
   }
+
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  fun isPlaying(): Boolean {
+    return mediaPlayer.isPlaying;
+  }
+
 }
